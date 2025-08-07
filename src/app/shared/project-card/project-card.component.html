@@ -1,0 +1,18 @@
+<div class="project" style="background-image: linear-gradient(#ffffff, #C2D7EC);">
+    <div class="background"></div>
+    <div class="content">
+        <div class="top-details">
+            <div class="project-logo">
+                <img src="{{project.icon}}" alt="">
+            </div>
+            <h3>{{project.name}}</h3>
+        </div>
+        <div class="project-sub-info">
+            <app-avatar-members [totalCount]="totalCount(project.teamMembers)" [maxVisible]="3" [members]="project.teamMembers" />
+            <div class="updates">
+                <span [style]="{color: getFontColor(project.progress)}">{{project.progress}}%</span>
+                <span>{{project.lastUpdate}}</span>
+            </div>
+        </div>
+    </div>
+</div>

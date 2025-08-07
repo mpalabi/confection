@@ -1,0 +1,14 @@
+<div class="avatar-group">
+  <ng-container *ngFor="let member of visibleMembers">
+    <div class="avatar" [title]="member.name">
+      <ng-container *ngIf="member.img; else initials">
+        <img [src]="member.img" [alt]="member.name" />
+      </ng-container>
+      <ng-template #initials>{{ member.initials }}</ng-template>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="remainingCount > 0">
+    <div class="avatar avatar-extra">+{{ remainingCount }}</div>
+  </ng-container>
+</div>

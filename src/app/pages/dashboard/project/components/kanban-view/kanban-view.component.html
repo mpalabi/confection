@@ -1,0 +1,271 @@
+<div class="kanban-container">
+    <!-- Header -->
+    <div class="kanban-header">
+        <h3>Project Name</h3>
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam accusantium harum voluptates doloribus,
+            aliquam fugiat quod magni? Delectus iure enim velit eius alias hic, deserunt reiciendis repudiandae maxime
+            qui commodi.</p>
+    </div>
+
+    <div class="team-avatars">
+       <app-avatar-members [members]="teamMembers()" [totalCount]="teamMembers().length" />
+    </div>
+
+    <!-- Kanban Board -->
+    <div class="kanban-board" cdkDropListGroup>
+        @for (column of columns(); track column.id) {
+        <div class="kanban-column">
+            <!-- Column Header -->
+            <div class="column-header" [style.border-left-color]="column.color">
+                <div class="column-title">
+                    <div class="status-indicator" [ngClass]="getStatusClass(column.id)"></div>
+                    <h3>{{ column.title }}</h3>
+                    <span class="task-count">{{ column.tasks.length }}</span>
+                </div>
+                <div class="column-actions">
+                    <button class="icon-btn" (click)="editColumn(column)" [title]="'Edit ' + column.title">
+                        ⋯
+                    </button>
+                    <button class="icon-btn delete-btn" (click)="deleteColumn(column.id)"
+                        [title]="'Delete ' + column.title">
+                        🗑️
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tasks -->
+            <div class="task-list" cdkDropList [cdkDropListData]="column.tasks"
+                (cdkDropListDropped)="onTaskDrop($event)">
+                @for (task of column.tasks; track task.id) {
+                <div class="task-card" cdkDrag [cdkDragData]="task" (click)="selectTask(task)"
+                    [class.selected]="selectedTask()?.id === task.id">
+                    <div class="task-header">
+                        <span class="task-category">{{ task.category }}</span>
+                        <span class="task-priority" [ngClass]="'priority-' + task.priority.toLowerCase()">
+                            {{ task.priority }}
+                        </span>
+                    </div>
+
+                    <h4 class="task-title">{{ task.title }}</h4>
+                    <p class="task-description">{{ task.description }}</p>
+
+                    <div class="task-footer">
+                        <div class="task-assignees">
+                            <app-avatar-members [members]="task.assignees" [totalCount]="task.assignees.length"/>
+                        </div>
+                        <div class="task-meta">
+                            @if (task.attachments > 0) {
+                            <span class="meta-item" [title]="task.attachments + ' attachments'">
+                                📎 {{ task.attachments }}
+                            </span>
+                            }
+                            @if (task.comments > 0) {
+                            <span class="meta-item" [title]="task.comments + ' comments'">
+                                💬 {{ task.comments }}
+                            </span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="task-actions">
+                        <button class="task-action-btn" (click)="editTask(task); $event.stopPropagation()">
+                            ✏️
+                        </button>
+                        <button class="task-action-btn delete" (click)="deleteTask(task.id); $event.stopPropagation()">
+                            🗑️
+                        </button>
+                    </div>
+                </div>
+                }
+
+                @if (column.tasks.length === 0) {
+                <div class="empty-column">
+                    <p>No tasks yet</p>
+                    <button class="btn-ghost" (click)="openAddTaskModal(column.id)">
+                        + Add a task
+                    </button>
+                </div>
+                }
+            </div>
+        </div>
+        }
+
+        <!-- Add Column Button -->
+        <div class="add-column-card">
+            <button class="add-column-btn" (click)="toggleAddColumnModal()">
+                <span class="plus-icon">+</span>
+                <span>Add another list</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Column Modal -->
+@if (showAddColumnModal()) {
+<div class="modal-overlay" (click)="toggleAddColumnModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Add New Column</h3>
+            <button class="close-btn" (click)="toggleAddColumnModal()">×</button>
+        </div>
+        <form (ngSubmit)="addColumn()" #columnForm="ngForm">
+            <div class="form-group">
+                <label for="columnTitle">Column Title</label>
+                <input id="columnTitle" type="text" [(ngModel)]="newColumn.title" name="title" required
+                    class="form-control" placeholder="Enter column title..." #titleInput>
+            </div>
+            <div class="form-group">
+                <label>Color Theme</label>
+                <div class="color-picker">
+                    @for (color of columnColors(); track color) {
+                    <button type="button" class="color-option" [style.background-color]="color"
+                        [class.selected]="newColumn.color === color" (click)="newColumn.color = color"
+                        [title]="'Select ' + color"></button>
+                    }
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" (click)="toggleAddColumnModal()">
+                    Cancel
+                </button>
+                <button type="submit" class="btn-primary" [disabled]="!columnForm.valid || isLoading()">
+                    @if (isLoading()) {
+                    <span class="loading-spinner"></span>
+                    }
+                    Add Column
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+}
+
+<!-- Add/Edit Task Modal -->
+@if (showAddTaskModal() || showEditTaskModal()) {
+<div class="modal-overlay" (click)="closeTaskModals()">
+    <div class="modal large" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>{{ showEditTaskModal() ? 'Edit Task' : 'Add New Task' }}</h3>
+            <button class="close-btn" (click)="closeTaskModals()">×</button>
+        </div>
+        <form (ngSubmit)="showEditTaskModal() ? updateTask() : addTask()" #taskForm="ngForm">
+            <div class="form-row">
+                <div class="form-group flex-2">
+                    <label for="taskTitle">Task Title *</label>
+                    <input id="taskTitle" type="text" [(ngModel)]="newTask.title" name="title" required
+                        class="form-control" placeholder="Enter task title...">
+                </div>
+                <div class="form-group">
+                    <label for="taskPriority">Priority</label>
+                    <select id="taskPriority" [(ngModel)]="newTask.priority" name="priority" class="form-control">
+                        <option value="Low">Low</option>
+                        <option value="Med">Medium</option>
+                        <option value="High">High</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="taskDescription">Description</label>
+                <textarea id="taskDescription" [(ngModel)]="newTask.description" name="description" class="form-control"
+                    rows="3" placeholder="Enter task description..."></textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="taskCategory">Category</label>
+                    <input id="taskCategory" type="text" [(ngModel)]="newTask.category" name="category"
+                        class="form-control" placeholder="e.g., Web Design, Development...">
+                </div>
+                <div class="form-group">
+                    <label for="taskColumn">Column *</label>
+                    <select id="taskColumn" [(ngModel)]="selectedColumnId" name="column" class="form-control" required>
+                        <option value="">Select Column</option>
+                        @for (column of columns(); track column.id) {
+                        <option [value]="column.id">{{ column.title }}</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Assignees</label>
+                <div class="assignees-picker">
+                    @for (member of teamMembers(); track member.name) {
+                    <label class="assignee-option">
+                        <input type="checkbox" [value]="member.name"
+                            [checked]="newTask.assignees?.includes(member.name)"
+                            (change)="toggleAssignee(member.name, $event)">
+                        <div class="assignee-card">
+                            <div class="assignee-avatar small">{{ member.initials }}</div>
+                            <span>{{ member.name }}</span>
+                        </div>
+                    </label>
+                    }
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" (click)="closeTaskModals()">
+                    Cancel
+                </button>
+                <button type="submit" class="btn-primary" [disabled]="!taskForm.valid || isLoading()">
+                    @if (isLoading()) {
+                    <span class="loading-spinner"></span>
+                    }
+                    {{ showEditTaskModal() ? 'Update Task' : 'Add Task' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+}
+
+<!-- Task Details Modal -->
+@if (selectedTask() && showTaskDetails()) {
+<div class="modal-overlay" (click)="closeTaskDetails()">
+    <div class="modal large" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>{{ selectedTask()!.title }}</h3>
+            <button class="close-btn" (click)="closeTaskDetails()">×</button>
+        </div>
+        <div class="task-details-content">
+            <div class="task-detail-section">
+                <h4>Description</h4>
+                <p>{{ selectedTask()!.description || 'No description provided.' }}</p>
+            </div>
+            <div class="task-detail-row">
+                <div class="task-detail-section">
+                    <h4>Priority</h4>
+                    <span class="task-priority" [ngClass]="'priority-' + selectedTask()!.priority.toLowerCase()">
+                        {{ selectedTask()!.priority }}
+                    </span>
+                </div>
+                <div class="task-detail-section">
+                    <h4>Category</h4>
+                    <span class="task-category">{{ selectedTask()!.category }}</span>
+                </div>
+            </div>
+            <div class="task-detail-section">
+                <h4>Assignees</h4>
+                <div class="assignees-list">
+                    @for (assignee of selectedTask()!.assignees; track assignee) {
+                    <div class="assignee-item">
+                        <div class="assignee-avatar small">{{ getInitials(assignee) }}</div>
+                        <span>{{ assignee }}</span>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-secondary" (click)="editTask(selectedTask()!)">
+                Edit Task
+            </button>
+            <button class="btn-danger" (click)="deleteTask(selectedTask()!.id)">
+                Delete Task
+            </button>
+        </div>
+    </div>
+</div>
+}

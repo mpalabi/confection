@@ -1,0 +1,13 @@
+<div class="overview">
+    <app-navbar/>
+
+    <div class="content-constraint">
+        <div class="content">
+            <div class="grid">
+                @for (project of projects; track $index) {
+                    <app-project-card [routerLink]="['/dashboard/project']" [queryParams]="{id: project.id}" [project]="project"/>
+                }
+            </div>
+        </div>
+    </div>
+</div>
