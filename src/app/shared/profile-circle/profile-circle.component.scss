@@ -1,0 +1,27 @@
+.profile-circle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  overflow: hidden;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  img {
+      object-fit: cover;
+      border-radius: 50%;
+    }
+}
+
+.hover-card {
+    position: absolute;
+    z-index: 10;
+    top: 220px;
+    min-width: 200px;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 12px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+}

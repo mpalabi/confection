@@ -11,6 +11,7 @@ export const routes: Routes = [
     {
         path: 'dashboard',
         component: DashboardComponent,
+        data: { breadcrumb: 'Dashboard' },
         loadChildren: () => import('./routes/dashboard.routes').then((m) => m.dashboardRoutes)
     },
     {

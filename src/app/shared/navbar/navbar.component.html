@@ -1,8 +1,34 @@
 <nav>
     <div class="container">
         <div class="logo">
-            <span>Confection</span>
-            
+            <span 
+             hoverAttach
+  [hoverAttach]="tooltipTpl"
+  hoverPosition="bottom"
+  [hoverDelay]="300">Confection</span>
+            <app-breadcrumbs/>
+        </div>
+
+        <div class="user-interactivity">
+            <div class="user">
+                <app-profile-circle
+    [name]="'Pandit Alabi'"
+    [hoverDelaySeconds]="1.5"
+    [size]="40"
+  >
+    <div profile-card>
+      <!-- You can slot in anything here -->
+      <strong>Brooklyn Simmons</strong><br />
+      Role: Designer<br />
+      Status: Active
+    </div>
+  </app-profile-circle>
+            </div>
         </div>
     </div>
 </nav>
+
+
+<ng-template #tooltipTpl>
+  <div class="tooltip">This is a tooltip!</div>
+</ng-template>

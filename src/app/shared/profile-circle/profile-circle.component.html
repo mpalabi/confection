@@ -1,0 +1,17 @@
+<div
+  class="profile-circle"
+  [ngStyle]="{
+    width: size + 'px',
+    height: size + 'px',
+    backgroundColor: bgColor,
+    fontSize: fontSize,
+    color: textColor
+  }"
+>
+  <img *ngIf="imageUrl; else initialsTpl" [src]="imageUrl" [style.width.px]="size" [style.height.px]="size" />
+  <ng-template #initialsTpl>{{ initials }}</ng-template>
+</div>
+
+<div class="hover-card" *ngIf="showCard" [ngStyle]="cardPosition">
+  <ng-content select="[profile-card]"></ng-content>
+</div>

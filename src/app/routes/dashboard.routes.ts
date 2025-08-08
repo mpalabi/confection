@@ -10,10 +10,12 @@ export const dashboardRoutes : Route[] = [
     },
     {
         path: 'overview',
-        component: OverviewComponent
+        component: OverviewComponent,
+        data: { breadcrumb: 'Overview' }
     },
     {
         path: 'project',
-        component: ProjectComponent
+        component: ProjectComponent,
+        data: { breadcrumb: 'Project' }
     }
 ]
