@@ -49,7 +49,7 @@ export class HoverAttachDirective implements OnDestroy {
     const rect = hostElem.getBoundingClientRect();
 
     const container = document.createElement('div');
-    container.style.position = 'absolute';
+    // container.style.position = 'absolute';
     container.style.zIndex = '9999';
     container.style.transition = '0.3s all ease-in-out';
 

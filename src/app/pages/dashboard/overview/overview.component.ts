@@ -2,10 +2,13 @@ import { Component } from '@angular/core';
 import { NavbarComponent } from "../../../shared/navbar/navbar.component";
 import { ProjectCardComponent } from "../../../shared/project-card/project-card.component";
 import { RouterLink } from '@angular/router';
+import { LucideAngularModule } from 'lucide-angular';
+import { ModalButtonComponent } from "../../../shared/modal-button/modal-button.component";
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-overview',
-  imports: [NavbarComponent, ProjectCardComponent, RouterLink],
+  imports: [ CommonModule, ProjectCardComponent, RouterLink, LucideAngularModule, ModalButtonComponent],
   templateUrl: './overview.component.html',
   styleUrl: './overview.component.scss'
 })
@@ -235,14 +238,14 @@ export class OverviewComponent {
         "fullName": "Hassan Ibrahim",
         "email": "hassan.ibrahim@company.com",
         "role": "Data Analyst",
-        "avatar": "https://picsum.photos/seed/hassan/100/100" 
+        "img": "https://picsum.photos/seed/hassan/100/100" 
       },
       { 
         "initials": "HI", 
         "fullName": "Hassan Ibrahim",
         "email": "hassan.ibrahim@company.com",
         "role": "Data Analyst",
-        "avatar": "https://picsum.photos/seed/hassan/100/100" 
+        "img": "https://picsum.photos/seed/hassan/100/100" 
       },
       { 
         "initials": "ZX", 
@@ -281,21 +284,21 @@ export class OverviewComponent {
         "fullName": "Yuki Tanaka",
         "email": "yuki.tanaka@company.com",
         "role": "AI Developer",
-        "avatar": "https://picsum.photos/seed/yuki/100/100" 
+        "img": "https://picsum.photos/seed/yuki/100/100" 
       },
       { 
         "initials": "WE", 
         "fullName": "William Evans",
         "email": "william.evans@company.com",
         "role": "Conversation Designer",
-        "avatar": "https://picsum.photos/seed/william/100/100" 
+        "img": "https://picsum.photos/seed/william/100/100" 
       },
       { 
         "initials": "YU", 
         "fullName": "Yuki Tanaka",
         "email": "yuki.tanaka@company.com",
         "role": "AI Developer",
-        "avatar": "https://picsum.photos/seed/yuki/100/100" 
+        "img": "https://picsum.photos/seed/yuki/100/100"
       },
     ],
     "additionalMembers": 6,
@@ -305,5 +308,17 @@ export class OverviewComponent {
     "color": "#FD7E14"
   }
 ]
+
+showModal = false
+
+openModal(){
+  this.showModal = true
+}
+toggleDropdownMenu(){
+
+}
+closeModal(){
+
+}
 
 }

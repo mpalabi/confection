@@ -1,26 +1,95 @@
+.overview {
+    padding: 20px;
 
+    .filter-section {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 40px;
 
-            .grid {
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                gap: 1.5rem;
+        .search {
+            height: 40px;
+            border: 1px solid grey;
+            border-radius: 7px;
+            overflow: hidden;
 
-                // Tablet Landscape (768px - 991px) - 3 columns
-                @media (min-width: 768px) and (max-width: 991px) {
-                    grid-template-columns: repeat(3, 1fr);
-                    gap: 1.25rem;
-                }
+            input {
+                border: 0;
+                height: 100%;
+                width: 100%;
+                padding: 0 10px;
+                font-size: 20px;
+            }
+        }
 
-                // Tablet Portrait (576px - 767px) - 2 columns
-                @media (min-width: 576px) and (max-width: 767px) {
-                    grid-template-columns: repeat(2, 1fr);
-                    gap: 1rem;
-                }
+        .actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
 
-                // Mobile (up to 575px) - 1 column
-                @media (max-width: 575px) {
-                    grid-template-columns: 1fr;
-                    gap: 1rem;
+            button {
+                height: 40px;
+            }
+
+            .new-project {
+                padding: 0 15px;
+            }
+
+            .view-type {
+
+                display: flex;
+                align-items: center;
+                gap: 10px;
+
+                button {
+                    width: 40px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    border-radius: 12px;
+                    overflow: hidden;
+                    color: grey;
+                    cursor: pointer;
+                    // background: linear-gradient(145deg, #ffffff, #ebebeb);
+                    background-color: #fff;
+                    border: 2px solid rgba(234, 234, 234, 0.903); // Adjust based on your purple
+
+                    .my-icon {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+
+                        ::ng-deep svg {
+                            height: 20px;
+                            width: 20px;
+                        }
+                    }
                 }
             }
-    
+        }
+    }
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+
+    // Tablet Landscape (768px - 991px) - 3 columns
+    @media (min-width: 768px) and (max-width: 991px) {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.25rem;
+    }
+
+    // Tablet Portrait (576px - 767px) - 2 columns
+    @media (min-width: 576px) and (max-width: 767px) {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    // Mobile (up to 575px) - 1 column
+    @media (max-width: 575px) {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}

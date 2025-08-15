@@ -1,0 +1,19 @@
+<div class="neon-btn-container">
+  <button class="neon-btn-main" (click)="onMainClick()">
+    @if (showIcon) {
+        <lucide-angular [style]="{fill : fill}"  [name]="iconName" class="button-icon"/>
+    }
+    <span>{{ label }}</span>
+  </button>
+
+  <div class="dropdown-wrapper" *ngIf="showDropdown">
+    <button class="neon-btn-dropdown" (click)="toggleMenu()">
+      <span class="arrow">▼</span>
+    </button>
+    <ul class="dropdown-menu" *ngIf="menuOpen">
+      <li *ngFor="let item of dropdownItems" (click)="onSelect(item)">
+        {{ item }}
+      </li>
+    </ul>
+  </div>
+</div>

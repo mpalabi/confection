@@ -1,8 +1,38 @@
 <div class="overview">
-            <div class="grid">
-                @for (project of projects; track $index) {
-                    <app-project-card [routerLink]="['/dashboard/project']" [queryParams]="{id: project.id}" [project]="project"/>
-                }
+    <div class="filter-section">
+        <div class="search">
+            <input type="search" placeholder="Filter project">
+        </div>
+        <div class="actions">
+            <div class="view-type">
+                <button>
+                    <lucide-icon name="kanban" class="my-icon"></lucide-icon>
+                </button>
+                <button>
+                    <lucide-icon name="chart-gantt" class="my-icon"></lucide-icon>
+                </button>
+                <button>
+                    <lucide-icon name="layout-grid" class="my-icon"></lucide-icon>
+                </button>
             </div>
-       
+            <!-- <button class="new-project">New Project</button> -->
+            <app-modal-button label="New Project" iconName="square-plus" [showDropdown]="true" (mainClick)="openModal()"
+                (dropdownClick)="toggleDropdownMenu()" />
+        </div>
+    </div>
+    <div class="grid">
+        @for (project of projects; track $index) {
+        <app-project-card [routerLink]="['/dashboard/project']" [queryParams]="{id: project.id}" [project]="project" />
+        }
+    </div>
+
+</div>
+
+
+<!-- Modal -->
+<div *ngIf="showModal" class="modal-backdrop">
+    <div class="modal-content">
+        <h2>Create New Item</h2>
+        <button (click)="closeModal()">Close</button>
+    </div>
 </div>
