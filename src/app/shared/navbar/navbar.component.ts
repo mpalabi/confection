@@ -11,5 +11,39 @@ import { HoverAttachDirective } from '../../utils/dynamic-hover.directive';
 })
 export class NavbarComponent {
 
+   userName = 'Pandit Alabi';
+  userRole = 'Product Designer';
+  userStatus = 'Active';
+  hasNotifications = true;
+
+  constructor() { }
+
+  ngOnInit(): void {
+  }
+
+  onLogoClick(): void {
+    // Handle logo click - navigate to dashboard
+    console.log('Navigate to dashboard');
+  }
+
+  onNotificationClick(): void {
+    // Handle notification click
+    console.log('Show notifications');
+  }
+
+  onProfileClick(): void {
+    // Handle profile click
+    console.log('Show profile menu');
+  }
+
+  getUserInitials(name: string): string {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  }
 
 }
+

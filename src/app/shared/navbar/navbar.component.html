@@ -1,4 +1,4 @@
-<nav>
+<!-- <nav>
     <div class="container">
         <div class="logo">
             <span 
@@ -17,7 +17,6 @@
     [size]="40"
   >
     <div profile-card>
-      <!-- You can slot in anything here -->
       <strong>Brooklyn Simmons</strong><br />
       Role: Designer<br />
       Status: Active
@@ -31,4 +30,81 @@
 
 <ng-template #tooltipTpl>
   <div class="tooltip">This is a tooltip!</div>
+</ng-template> -->
+
+
+<nav class="navigation">
+  <div class="nav-container">
+    <div class="nav-left">
+      <div class="logo" 
+           (click)="onLogoClick()"
+           [hoverAttach]="logoTooltip"
+           hoverPosition="bottom"
+           [hoverDelay]="500">
+        <div class="logo-icon">
+          <span>{{ getUserInitials('Confection') }}</span>
+        </div>
+        <span class="logo-text">Confection</span>
+      </div>
+      
+      <div class="nav-divider"></div>
+      
+      <app-breadcrumbs class="breadcrumbs"></app-breadcrumbs>
+    </div>
+
+    <div class="nav-right">
+      <button class="nav-btn notification-btn" 
+              (click)="onNotificationClick()"
+              [hoverAttach]="notificationTooltip"
+              hoverPosition="bottom"
+              [hoverDelay]="300">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+        @if (hasNotifications) {
+          <div class="notification-badge"></div>
+        }
+      </button>
+
+      <div class="nav-divider"></div>
+
+      <div class="profile-wrapper">
+        <app-profile-circle
+          [name]="userName"
+          [size]="40"
+          [hoverDelaySeconds]="0.3"
+          class="profile-circle"
+          (click)="onProfileClick()">
+          
+          <div profile-card class="profile-card">
+            <div class="profile-info">
+              <div class="profile-name">{{ userName }}</div>
+              <div class="profile-role">{{ userRole }}</div>
+              <div class="profile-status">
+                <div class="status-indicator" 
+                     [class.active]="userStatus === 'Active'"></div>
+                <span>{{ userStatus }}</span>
+              </div>
+            </div>
+            <div class="profile-actions">
+              <button class="profile-action-btn">View Profile</button>
+              <button class="profile-action-btn">Settings</button>
+              <div class="profile-divider"></div>
+              <button class="profile-action-btn logout">Sign Out</button>
+            </div>
+          </div>
+        </app-profile-circle>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Tooltips -->
+<ng-template #logoTooltip>
+  <div class="tooltip">Back to Dashboard</div>
+</ng-template>
+
+<ng-template #notificationTooltip>
+  <div class="tooltip">Notifications</div>
 </ng-template>
