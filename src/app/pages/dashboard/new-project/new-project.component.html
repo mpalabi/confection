@@ -1,0 +1,351 @@
+<div class="new-project">
+  <div class="new-project-header">
+    <div class="header-content">
+      <button class="back-btn" (click)="onCancel()" title="Go back">
+        <lucide-icon name="arrow-left"></lucide-icon>
+      </button>
+      
+      <div class="header-info">
+        <h1 class="page-title">Create New Project</h1>
+        <p class="page-subtitle">{{ getStepDescription() }}</p>
+      </div>
+
+      <div class="step-indicator">
+        <div class="step-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" 
+                 [style.width.%]="(currentStep / totalSteps) * 100"></div>
+          </div>
+          <span class="step-text">{{ currentStep }} of {{ totalSteps }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="new-project-content">
+    <div class="form-container">
+      <form [formGroup]="projectForm" (ngSubmit)="onSubmit()" class="project-form">
+        
+        <!-- Step 1: Basic Information -->
+        <div class="form-step" *ngIf="currentStep === 1">
+          <div class="step-header">
+            <lucide-icon name="info" class="step-icon"></lucide-icon>
+            <h2>{{ getStepTitle() }}</h2>
+          </div>
+
+          <div class="form-fields">
+            <div class="form-group">
+              <label for="projectName" class="form-label">
+                Project Name *
+              </label>
+              <input 
+                id="projectName"
+                type="text" 
+                class="form-input"
+                formControlName="name"
+                placeholder="Enter project name"
+                [class.error]="projectForm.get('name')?.invalid && projectForm.get('name')?.touched">
+              <div class="form-error" 
+                   *ngIf="projectForm.get('name')?.invalid && projectForm.get('name')?.touched">
+                Project name is required
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="description" class="form-label">
+                Description
+              </label>
+              <textarea 
+                id="description"
+                class="form-textarea"
+                formControlName="description"
+                placeholder="Describe what this project is about..."
+                rows="4"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="websiteUrl" class="form-label">
+                Website URL
+                <span class="label-hint">(For live commenting feature)</span>
+              </label>
+              <div class="input-group">
+                <lucide-icon name="globe" class="input-icon"></lucide-icon>
+                <input 
+                  id="websiteUrl"
+                  type="url" 
+                  class="form-input with-icon"
+                  formControlName="websiteUrl"
+                  placeholder="https://example.com"
+                  [class.error]="projectForm.get('websiteUrl')?.invalid && projectForm.get('websiteUrl')?.touched">
+              </div>
+              <div class="form-error" 
+                   *ngIf="projectForm.get('websiteUrl')?.invalid && projectForm.get('websiteUrl')?.touched">
+                Please enter a valid URL
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Project Settings -->
+        <div class="form-step" *ngIf="currentStep === 2">
+          <div class="step-header">
+            <lucide-icon name="settings" class="step-icon"></lucide-icon>
+            <h2>{{ getStepTitle() }}</h2>
+          </div>
+
+          <div class="form-fields">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Priority</label>
+                <div class="priority-options">
+                  <button *ngFor="let priority of priorityOptions"
+                          type="button"
+                          class="priority-option"
+                          [class.selected]="projectForm.get('priority')?.value === priority.value"
+                          (click)="projectForm.patchValue({ priority: priority.value })">
+                    <div class="priority-indicator" [style.background]="priority.color">
+                      <lucide-icon [name]="priority.icon" size="16"></lucide-icon>
+                    </div>
+                    <span class="priority-label">{{ priority.label }}</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Status</label>
+                <div class="status-options">
+                  <button *ngFor="let status of statusOptions"
+                          type="button"
+                          class="status-option"
+                          [class.selected]="projectForm.get('status')?.value === status.value"
+                          (click)="projectForm.patchValue({ status: status.value })">
+                    <div class="status-indicator" [style.background]="status.color"></div>
+                    <span class="status-label">{{ status.label }}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="startDate" class="form-label">Start Date</label>
+                <div class="input-group">
+                  <lucide-icon name="calendar" class="input-icon"></lucide-icon>
+                  <input 
+                    id="startDate"
+                    type="date" 
+                    class="form-input with-icon"
+                    formControlName="startDate">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="endDate" class="form-label">End Date</label>
+                <div class="input-group">
+                  <lucide-icon name="calendar" class="input-icon"></lucide-icon>
+                  <input 
+                    id="endDate"
+                    type="date" 
+                    class="form-input with-icon"
+                    formControlName="endDate">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="tags" class="form-label">
+                Tags
+                <span class="label-hint">(Separate with commas)</span>
+              </label>
+              <div class="input-group">
+                <lucide-icon name="tag" class="input-icon"></lucide-icon>
+                <input 
+                  id="tags"
+                  type="text" 
+                  class="form-input with-icon"
+                  formControlName="tags"
+                  placeholder="design, frontend, mobile">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Team Members -->
+        <div class="form-step" *ngIf="currentStep === 3">
+          <div class="step-header">
+            <lucide-icon name="users" class="step-icon"></lucide-icon>
+            <h2>{{ getStepTitle() }}</h2>
+          </div>
+
+          <div class="form-fields">
+            <div class="members-section">
+              <div class="members-header">
+                <h3>Add Team Members</h3>
+                <p class="members-subtitle">
+                  Select team members who will have access to this project
+                </p>
+              </div>
+
+              <div class="selected-members" *ngIf="selectedMembers.length > 0">
+                <h4>Selected Members ({{ selectedMembers.length }})</h4>
+                <div class="selected-list">
+                  <div class="member-chip" *ngFor="let member of selectedMembers">
+                    <div class="member-avatar">
+                      <img *ngIf="member.avatar" [src]="member.avatar" [alt]="member.fullName">
+                      <span *ngIf="!member.avatar" class="avatar-initials">
+                        {{ getInitials(member.fullName) }}
+                      </span>
+                    </div>
+                    <span class="member-name">{{ member.fullName }}</span>
+                    <button type="button" 
+                            class="remove-member" 
+                            (click)="onMemberToggle(member)"
+                            title="Remove member">
+                      <lucide-icon name="x" size="14"></lucide-icon>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="available-members">
+                <h4>Available Members</h4>
+                <div class="members-list" *ngIf="users.length > 0; else noUsers">
+                  <div class="member-item" 
+                       *ngFor="let user of users"
+                       [class.selected]="isMemberSelected(user)"
+                       (click)="onMemberToggle(user)">
+                    <div class="member-info">
+                      <div class="member-avatar">
+                        <img *ngIf="user.avatar" [src]="user.avatar" [alt]="user.fullName">
+                        <span *ngIf="!user.avatar" class="avatar-initials">
+                          {{ getInitials(user.fullName) }}
+                        </span>
+                      </div>
+                      <div class="member-details">
+                        <span class="member-name">{{ user.fullName }}</span>
+                        <span class="member-email">{{ user.email }}</span>
+                      </div>
+                    </div>
+                    <div class="member-checkbox">
+                      <lucide-icon name="check" *ngIf="isMemberSelected(user)" size="16"></lucide-icon>
+                    </div>
+                  </div>
+                </div>
+                <ng-template #noUsers>
+                  <p>No users available</p>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <div class="actions-left">
+            <button type="button" 
+                    class="btn btn-secondary" 
+                    (click)="onCancel()"
+                    [disabled]="isSubmitting">
+              Cancel
+            </button>
+          </div>
+
+          <div class="actions-right">
+            <button type="button" 
+                    class="btn btn-outline" 
+                    *ngIf="currentStep > 1"
+                    (click)="previousStep()"
+                    [disabled]="isSubmitting">
+              <lucide-icon name="arrow-left"></lucide-icon>
+              Previous
+            </button>
+
+            <button type="button" 
+                    class="btn btn-primary" 
+                    *ngIf="currentStep < totalSteps"
+                    (click)="nextStep()"
+                    [disabled]="!isStepValid() || isSubmitting">
+              Next
+              <lucide-icon name="arrow-right"></lucide-icon>
+            </button>
+
+            <button type="submit" 
+                    class="btn btn-primary" 
+                    *ngIf="currentStep === totalSteps"
+                    [disabled]="projectForm.invalid || isSubmitting">
+              <lucide-icon *ngIf="!isSubmitting" name="check"></lucide-icon>
+              <lucide-icon *ngIf="isSubmitting" name="loader-2" class="spinning"></lucide-icon>
+              {{ isSubmitting ? 'Creating...' : 'Create Project' }}
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Preview Panel -->
+    <div class="preview-panel">
+      <div class="preview-content">
+        <h3>Project Preview</h3>
+        <div class="preview-card">
+          <div class="preview-header">
+            <div class="project-icon">
+              <span>{{ projectForm.get('name')?.value?.charAt(0) || 'P' }}</span>
+            </div>
+            <div class="project-info">
+              <h4>{{ projectForm.get('name')?.value || 'Project Name' }}</h4>
+              <div class="project-meta">
+                <span class="priority-badge" 
+                      [style.background]="getPriorityOption(projectForm.get('priority')?.value)?.color">
+                  {{ getPriorityOption(projectForm.get('priority')?.value)?.label }}
+                </span>
+                <span class="status-badge"
+                      [style.background]="getStatusOption(projectForm.get('status')?.value)?.color">
+                  {{ getStatusOption(projectForm.get('status')?.value)?.label }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="preview-description" *ngIf="projectForm.get('description')?.value">
+            <p>{{ projectForm.get('description')?.value }}</p>
+          </div>
+
+          <div class="preview-website" *ngIf="projectForm.get('websiteUrl')?.value">
+            <div class="website-info">
+              <lucide-icon name="globe" size="16"></lucide-icon>
+              <a [href]="projectForm.get('websiteUrl')?.value" target="_blank" rel="noopener">
+                {{ projectForm.get('websiteUrl')?.value }}
+              </a>
+            </div>
+          </div>
+
+          <div class="preview-dates" *ngIf="projectForm.get('startDate')?.value || projectForm.get('endDate')?.value">
+            <div class="date-info" *ngIf="projectForm.get('startDate')?.value">
+              <lucide-icon name="calendar-days" size="16"></lucide-icon>
+              <span>Starts: {{ projectForm.get('startDate')?.value | date:'mediumDate' }}</span>
+            </div>
+            <div class="date-info" *ngIf="projectForm.get('endDate')?.value">
+              <lucide-icon name="calendar-x" size="16"></lucide-icon>
+              <span>Ends: {{ projectForm.get('endDate')?.value | date:'mediumDate' }}</span>
+            </div>
+          </div>
+
+          <div class="preview-members" *ngIf="selectedMembers.length > 0">
+            <h5>Team Members ({{ selectedMembers.length }})</h5>
+            <div class="members-avatars">
+              <div class="member-avatar-small" *ngFor="let member of selectedMembers.slice(0, 5)">
+                <img *ngIf="member.avatar" [src]="member.avatar" [alt]="member.fullName">
+                <span *ngIf="!member.avatar" class="avatar-initials-small">
+                  {{ getInitials(member.fullName) }}
+                </span>
+              </div>
+              <div class="more-members" *ngIf="selectedMembers.length > 5">
+                +{{ selectedMembers.length - 5 }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

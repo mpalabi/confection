@@ -1,38 +1,132 @@
 <div class="overview">
-    <div class="filter-section">
-        <div class="search">
-            <input type="search" placeholder="Filter project">
+  <div class="overview-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="page-title">Projects</h1>
+        <p class="page-subtitle">Manage your projects and track progress</p>
+      </div>
+      
+      <div class="header-actions">
+        <button class="refresh-btn" 
+                (click)="onRefresh()" 
+                [disabled]="isLoading"
+                title="Refresh projects">
+          <lucide-icon [name]="isLoading ? 'loader-2' : 'refresh-cw'" 
+                       [class.spinning]="isLoading"></lucide-icon>
+        </button>
+        
+        <app-modal-button 
+          label="New Project" 
+          iconName="plus"
+          variant="primary"
+          [showDropdown]="true" 
+          (mainClick)="onCreateProject()"
+          (dropdownClick)="onImportProject()"
+          dropdownLabel="Import Project">
+        </app-modal-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="filter-section">
+    <div class="filter-left">
+      <div class="search-container">
+        <div class="search-input-wrapper">
+          <lucide-icon name="search" class="search-icon"></lucide-icon>
+          <input 
+            type="search" 
+            placeholder="Search projects..." 
+            class="search-input"
+            [value]="searchQuery"
+            (input)="onSearchChange($event)">
+          
+          <button *ngIf="searchQuery" 
+                  class="clear-search" 
+                  (click)="searchSubject.next('')"
+                  title="Clear search">
+            <lucide-icon name="x" size="16"></lucide-icon>
+          </button>
         </div>
-        <div class="actions">
-            <div class="view-type">
-                <button>
-                    <lucide-icon name="kanban" class="my-icon"></lucide-icon>
-                </button>
-                <button>
-                    <lucide-icon name="chart-gantt" class="my-icon"></lucide-icon>
-                </button>
-                <button>
-                    <lucide-icon name="layout-grid" class="my-icon"></lucide-icon>
-                </button>
-            </div>
-            <!-- <button class="new-project">New Project</button> -->
-            <app-modal-button label="New Project" iconName="square-plus" [showDropdown]="true" (mainClick)="openModal()"
-                (dropdownClick)="toggleDropdownMenu()" />
+      </div>
+
+      <div class="filter-tabs">
+        <button *ngFor="let option of filterOptions"
+                class="filter-tab"
+                [class.active]="selectedFilter === option.value"
+                (click)="onFilterChange(option.value)">
+          <span class="filter-label">{{ option.label }}</span>
+          <span class="filter-count">{{ option.count }}</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="filter-right">
+      <div class="view-controls">
+        <div class="view-type-group">
+          <button *ngFor="let view of viewTypes"
+                  class="view-type-btn"
+                  [class.active]="currentView === view.type"
+                  (click)="onViewTypeChange(view.type)"
+                  [title]="view.label">
+            <lucide-icon [name]="view.icon"></lucide-icon>
+          </button>
         </div>
+      </div>
     </div>
-    <div class="grid">
-        @for (project of projects; track $index) {
-        <app-project-card [routerLink]="['/dashboard/project']" [queryParams]="{id: project.id}" [project]="project" />
-        }
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="loading-spinner">
+      <lucide-icon name="loader-2" class="spinning" size="32"></lucide-icon>
+      <p>Loading projects...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !isLoading" class="error-state">
+    <div class="error-content">
+      <lucide-icon name="alert-circle" class="error-icon" size="48"></lucide-icon>
+      <h3>Something went wrong</h3>
+      <p>{{ error }}</p>
+      <button class="retry-btn" (click)="onRefresh()">
+        <lucide-icon name="refresh-cw"></lucide-icon>
+        Try again
+      </button>
+    </div>
+  </div>
+
+  <!-- Projects Grid -->
+  <div *ngIf="!isLoading && !error" class="projects-container">
+    <div class="projects-grid" [class]="'view-' + currentView">
+      <app-project-card 
+        *ngFor="let project of filteredProjects"
+        [project]="project"
+        (click)="onProjectClick(project)">
+      </app-project-card>
     </div>
 
-</div>
-
-
-<!-- Modal -->
-<div *ngIf="showModal" class="modal-backdrop">
-    <div class="modal-content">
-        <h2>Create New Item</h2>
-        <button (click)="closeModal()">Close</button>
+    <!-- Empty State -->
+    <div *ngIf="filteredProjects.length === 0" class="empty-state">
+      <div class="empty-content">
+        <lucide-icon name="folder-plus" class="empty-icon" size="64"></lucide-icon>
+        <h3>{{ getEmptyStateMessage() }}</h3>
+        <p *ngIf="!searchQuery && selectedFilter === 'all'">
+          Projects help you organize your work and collaborate with your team.
+        </p>
+        <button *ngIf="!searchQuery && selectedFilter === 'all'" 
+                class="create-project-btn"
+                (click)="onCreateProject()">
+          <lucide-icon name="plus"></lucide-icon>
+          Create your first project
+        </button>
+        <button *ngIf="searchQuery || selectedFilter !== 'all'" 
+                class="clear-filters-btn"
+                (click)="searchSubject.next(''); onFilterChange('all')">
+          <lucide-icon name="x"></lucide-icon>
+          Clear filters
+        </button>
+      </div>
     </div>
+  </div>
 </div>

@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { NavbarComponent } from "../../../shared/navbar/navbar.component";
 import { ProjectCardComponent } from "../../../shared/project-card/project-card.component";
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { ModalButtonComponent } from "../../../shared/modal-button/modal-button.component";
 import { CommonModule } from '@angular/common';
+import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-overview',
@@ -320,5 +321,153 @@ toggleDropdownMenu(){
 closeModal(){
 
 }
+
+  filteredProjects: any[] = [];
+  currentView: any = 'grid';
+  searchQuery = '';
+  selectedFilter = 'all';
+  isLoading = true;
+  error: string | null = null;
+
+  private destroy$ = new Subject<void>();
+   searchSubject = new Subject<string>();
+
+  readonly viewTypes = [
+    { type: 'kanban' as any, icon: 'kanban', label: 'Kanban' },
+    { type: 'gantt' as any, icon: 'chart-gantt', label: 'Timeline' },
+    { type: 'grid' as any, icon: 'layout-grid', label: 'Grid' }
+  ];
+
+  readonly filterOptions = [
+    { value: 'all', label: 'All Projects', count: 0 },
+    { value: 'active', label: 'Active', count: 0 },
+    { value: 'completed', label: 'Completed', count: 0 },
+    { value: 'paused', label: 'Paused', count: 0 }
+  ];
+
+  constructor(
+    private router: Router
+  ) {}
+
+  ngOnInit(): void {
+    this.initializeSearch();
+    this.loadProjects();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private initializeSearch(): void {
+    this.searchSubject
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(query => {
+        this.searchQuery = query;
+        this.filterProjects();
+      });
+  }
+
+  private async loadProjects(): Promise<void> {
+    try {
+      this.isLoading = true;
+      this.error = null;
+      
+      this.updateFilterCounts();
+      this.filterProjects();
+    } catch (error) {
+      console.error('Error loading projects:', error);
+      this.error = 'Failed to load projects. Please try again.';
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  private updateFilterCounts(): void {
+    this.filterOptions.forEach(option => {
+      switch (option.value) {
+        case 'all':
+          option.count = this.projects.length;
+          break;
+        case 'active':
+          option.count = this.projects.filter(p => p.status === 'active').length;
+          break;
+        case 'completed':
+          option.count = this.projects.filter(p => p.status === 'completed').length;
+          break;
+        case 'paused':
+          option.count = this.projects.filter(p => p.status === 'paused').length;
+          break;
+      }
+    });
+  }
+
+  private filterProjects(): void {
+    let filtered = [...this.projects];
+
+    // Apply status filter
+    if (this.selectedFilter !== 'all') {
+      filtered = filtered.filter(project => project.status === this.selectedFilter);
+    }
+
+    // Apply search filter
+    if (this.searchQuery.trim()) {
+      const query = this.searchQuery.toLowerCase();
+      filtered = filtered.filter(project =>
+        project.name.toLowerCase().includes(query) ||
+        project.description?.toLowerCase().includes(query) ||
+        project.owner?.fullName.toLowerCase().includes(query)
+      );
+    }
+
+    this.filteredProjects = filtered;
+  }
+
+  onSearchChange(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    this.searchSubject.next(target.value);
+  }
+
+  onFilterChange(filter: string): void {
+    this.selectedFilter = filter;
+    this.filterProjects();
+  }
+
+  onViewTypeChange(viewType: any): void {
+    this.currentView = viewType;
+  }
+
+  onCreateProject(): void {
+    this.router.navigate(['/dashboard/new-project']);
+  }
+
+  onImportProject(): void {
+    // Handle project import
+    console.log('Import project clicked');
+  }
+
+  onProjectClick(project: any): void {
+    this.router.navigate(['/dashboard/project'], { 
+      queryParams: { id: project.id } 
+    });
+  }
+
+  async onRefresh(): Promise<void> {
+    await this.loadProjects();
+  }
+
+  getEmptyStateMessage(): string {
+    if (this.searchQuery) {
+      return `No projects found matching "${this.searchQuery}"`;
+    }
+    if (this.selectedFilter !== 'all') {
+      return `No ${this.selectedFilter} projects found`;
+    }
+    return 'No projects yet. Create your first project to get started!';
+  }
 
 }
